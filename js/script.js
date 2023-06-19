@@ -137,10 +137,10 @@ paymentSelect.addEventListener('change', (event) => {
   bitcoinSection.style.display = 'none';
 
   // Get the value of the selected payment option
-  const selectedPaymentMethod = event.target.value;
+  selectedPaymentMethod = event.target.value;
 
   // Show the corresponding payment method section based on the selected option
-  if(selectedPaymentMethod === 'credit-card') {
+ if(selectedPaymentMethod === 'credit-card') {
     creditCardSection.style.display = 'block';
   } else if(selectedPaymentMethod === 'paypal') {
       paypalSection.style.display = 'block';
@@ -152,7 +152,7 @@ paymentSelect.addEventListener('change', (event) => {
 //Creating variables for each input and logging them in the console
 console.log('Name Input:', nameInput);
 
-const emailInput = document.querySelector('input[name="email"]');
+var emailInput = document.getElementById("email");
 console.log('Email Input:', emailInput);
 
 console.log('Activities Fieldset:', activitiesFieldset);
@@ -165,6 +165,7 @@ var cvvInput = document.getElementById('cvv');
 
 var form = document.querySelector('form');
 console.log('Form:', form);
+
 
 //Variables for hint of different input fields
 var nameHint = document.getElementById('name-hint');
@@ -192,7 +193,8 @@ form.addEventListener('submit', function(event) {
     nameHint.style.display = 'none'; // Hide the name hint
   }
 
-  if (nameValue === '') {
+  if (nameValue.trim() === '') {
+    event.preventDefault();
     nameInput.parentNode.classList.add('not-valid');
     nameInput.parentNode.classList.remove('valid');
     nameHint.style.display = 'block';
@@ -204,18 +206,21 @@ form.addEventListener('submit', function(event) {
 
   //Form validation for Email Input
   var emailValue = email.value;
-  var emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue); // Use regular expression to validate email format
+  var emailIsValid = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(emailValue); // Use regular expression to validate email format
 
   console.log("Email Value:", emailValue);
   console.log("Email Validation:", emailIsValid);
 
   if (!emailIsValid) {
     event.preventDefault(); // Prevent form submission if email is invalid
+    emailInput.parentNode.classList.add('not-valid');
     emailHint.style.display = 'block'; // Show the email hint
   } else {
+    emailInput.parentNode.classList.remove('not-valid');
     emailHint.style.display = 'none'; // Hide the email hint
+    emailInput.parentNode.classList.add('valid');
   }
- 
+
 
   //Form validation for Register for Activities
   var activitiesChecked = checkActivities(); // Call a helper function to check if at least one activity is selected
@@ -224,44 +229,37 @@ form.addEventListener('submit', function(event) {
 
   if (!activitiesChecked) {
     event.preventDefault(); // Prevent form submission if no activity is selected
+    activitiesFieldset.classList.add('not-valid');
     activitiesHint.style.display = 'block'; // Show the activities hint
   } else {
+    activitiesFieldset.classList.remove('not-valid');
     activitiesHint.style.display = 'none'; // Hide the activities hint
+    activitiesFieldset.classList.add('valid');
+
   }
 
-  //Form validation for Card number
-  var ccNumValue = ccNumInput.value.trim();
-  var isCcNumValid = validateCcNum(ccNumValue);
-
-  console.log("Card Number Value:", ccNumValue);
-  console.log("Card Number Valid:", isCcNumValid);
-
-  if (!isCcNumValid) {
-    event.preventDefault();
-    if (ccHint) {
+  //Form validation for Payment Details
+ // Check if the payment method is selected
+ var selectedPaymentMethod = paymentSelect.value;
+ if (selectedPaymentMethod === 'credit-card') {
+    var ccNumValue = ccNumInput.value.trim();
+    var isCcNumValid = validateCcNum(ccNumValue);
+  
+    console.log("Card Number Value:", ccNumValue);
+    console.log("Card Number Valid:", isCcNumValid);
+    //Validate credit card number
+    if (!isCcNumValid) {
+      event.preventDefault();
+      ccNumInput.parentNode.classList.add('not-valid');
+      ccNumInput.parentNode.classList.remove('valid');
       ccHint.style.display = 'block';
-    }
-    if (ccNumInput) {
       ccNumInput.classList.add('error-border');
-    }
-  } else {
-    if (ccHint) {
+    } else {
+      ccNumInput.parentNode.classList.add('valid');
+      ccNumInput.parentNode.classList.remove('not-valid');
       ccHint.style.display = 'none';
-    }
-    if (ccNumInput) {
       ccNumInput.classList.remove('error-border');
     }
-  }
-
-  if (ccNumValue === '') {
-    ccNumInput.parentNode.classList.add('not-valid');
-    ccNumInput.parentNode.classList.remove('valid');
-    ccHint.style.display = 'block';
-  } else {
-    ccNumInput.parentNode.classList.add('valid');
-    ccNumInput.parentNode.classList.remove('not-valid');
-    ccHint.style.display = 'none';
-  }
 
   //Form validation for Zip Code
   var zipCodeValue = zipCodeInput.value.trim();
@@ -271,21 +269,15 @@ form.addEventListener('submit', function(event) {
 
   if (!isZipCodeValid) {
     event.preventDefault();
+    zipCodeInput.parentNode.classList.add('not-valid');
+    zipCodeInput.parentNode.classList.remove('valid');
     zipCodeHint.style.display = 'block';
     zipCodeInput.classList.add('error-border');
   } else {
     zipCodeHint.style.display = 'none';
-    zipCodeInput.classList.remove('error-border');
-  }
-
-  if (zipCodeValue === '') {
-    zipCodeInput.parentNode.classList.add('not-valid');
-    zipCodeInput.parentNode.classList.remove('valid');
-    zipCodeHint.style.display = 'block';
-  } else {
     zipCodeInput.parentNode.classList.add('valid');
     zipCodeInput.parentNode.classList.remove('not-valid');
-    zipCodeHint.style.display = 'none';
+    zipCodeInput.classList.remove('error-border');
   }
   
   //Form validation for CVV
@@ -299,20 +291,34 @@ form.addEventListener('submit', function(event) {
     event.preventDefault();
     cvvHint.style.display = 'block';
     cvvInput.classList.add('error-border');
+    cvvInput.parentNode.classList.add('not-valid');
+    cvvInput.parentNode.classList.remove('valid');
   } else {
     cvvHint.style.display = 'none';
     cvvInput.classList.remove('error-border');
-  }
-
-  if (cvvValue === '') {
-    cvvInput.parentNode.classList.add('not-valid');
-    cvvInput.parentNode.classList.remove('valid');
-    cvvHint.style.display = 'block';
-  } else {
     cvvInput.parentNode.classList.add('valid');
     cvvInput.parentNode.classList.remove('not-valid');
-    cvvHint.style.display = 'none';
   }
+  
+} else if (selectedPaymentMethod === 'paypal') {
+} else if (selectedPaymentMethod === 'bitcoin') {
+}
+
+
+  // Validate the form
+  if (nameValue.trim() && emailIsValid && activitiesChecked) {
+    if (selectedPaymentMethod === 'credit-card' && isCcNumValid && isZipCodeValid && isCvvValid) {
+      // If the form is valid for credit card payment, display the form data and submit the form
+      form.submit();
+    } else if (selectedPaymentMethod === 'paypal') {
+      // Handle form submission for PayPal payment
+      form.submit();
+    } else if(selectedPaymentMethod === 'bitcoin') {
+      // Handle form submission for Bitcoin payment
+      form.submit();
+    }
+  }
+  
 });
 
 //Function for activities checkbox
