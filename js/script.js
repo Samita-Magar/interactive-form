@@ -73,6 +73,7 @@ designSelect.addEventListener("change", function(event) {
 
 // Create variables to reference the "Register for Activities" <fieldset> element, the "Total: $" <p> element, and the hint element
 const activitiesFieldset = document.getElementById('activities');
+const activitiesElements = document.querySelectorAll('#activities input');
 const activitiesTotalCost = document.getElementById('activities-cost');
 const activitiesHint = document.getElementById('activities-hint');
 
@@ -88,6 +89,9 @@ let totalCost = 0;
 activitiesFieldset.addEventListener('change', (event) => {
   // Create a variable to store a reference to the "data-cost" attribute of the event.target
   const activityCost = +event.target.getAttribute('data-cost');
+  
+  // Set focus on the checkbox that triggered the change event
+  event.target.focus();
 
   // Create a conditional to determine if the event.target was checked or unchecked
   if (event.target.checked) {
@@ -107,6 +111,15 @@ activitiesFieldset.addEventListener('change', (event) => {
   } else {
     activitiesHint.style.display = 'none'; // Hide the hint
   }
+});
+
+// Set focus styling on Activities when focused
+activitiesElements.forEach( element => {
+  element.addEventListener('focus', e => element.parentElement.classList.add('focus'));
+  element.addEventListener('blur', e => {
+      const active = document.querySelector('.focus');
+      if (active) active.classList.remove('focus');
+  })
 });
 
 // Create variables to reference the payment select element and the payment method sections
